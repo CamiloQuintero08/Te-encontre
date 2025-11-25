@@ -1,0 +1,61 @@
+---
+import InicioIcon from "./Icons/Inicio.astro"
+import BuscarIcon from "./Icons/Buscar.astro"
+import SugerenciasIcon from "./Icons/Sugerencias.astro"
+import AmigosIcon from "./Icons/Amigos.astro"
+import ConfigIcon from "./Icons/Config.astro"
+---
+
+<aside id="default-sidebar"
+   class="fixed top-0 left-0 z-40 w-64 h-full transition-transform -translate-x-full sm:translate-x-0"
+   aria-label="Sidebar">
+
+   <div class="h-full px-4 py-6 overflow-y-auto 
+      bg-linear-to-b from-[#CAFF37] to-[#202A07]">
+      <h2 class="text-2xl text-white font-semibold mb-8">I Found U</h2>
+      <h3 class="text-white font-semibold mb-3">Descubrir</h3>
+      <ul class="space-y-3 mb-8">
+         <li>
+            <a href="#"
+               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white">
+               <InicioIcon class="size-5 mr-3"/>
+               Inicio
+            </a>
+         </li>
+         <li>
+            <a href="#"
+               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white">
+               <BuscarIcon class="size-5 mr-3 "/>
+               Buscar
+            </a>
+         </li>
+         <li>
+            <a href="#"
+               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white">
+               <SugerenciasIcon class="size-5 mr-3" />
+               Sugerencias
+            </a>
+         </li>
+      </ul>
+      <h3 class="text-white font-semibold mb-3">Biblioteca</h3>
+      <ul class="space-y-3">
+         <li>
+            <a href="#"
+               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white">
+               <AmigosIcon class="size-5 mr-3" />
+               Amigos
+            </a>
+         </li>
+         <li>
+            <a href="#"
+               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white">
+               <ConfigIcon  class="size-5 mr-3"/>
+               Opciones
+            </a>
+         </li>
+
+      </ul>
+   </div>
+</aside>
+
+<slot />
