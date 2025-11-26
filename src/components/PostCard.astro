@@ -52,11 +52,51 @@ const { post } = Astro.props;
             <p class="mt-2 text-gray-700 whitespace-pre-wrap">{post.content}</p>
             {
                 post.imageUrl && (
-                    <img
-                        src={post.imageUrl}
-                        alt="Post image"
-                        class="mt-4 rounded-lg max-h-96 w-full object-cover"
-                    />
+                    <div class="mt-4 relative group">
+                        <img
+                            src={post.imageUrl}
+                            alt="Post image"
+                            class="rounded-lg w-full object-contain max-h-[500px] cursor-pointer hover:opacity-95 transition"
+                            onclick={`document.getElementById('modal-${post.id}').classList.remove('hidden')`}
+                        />
+                        <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition">
+                            <button
+                                type="button"
+                                onclick={`document.getElementById('modal-${post.id}').classList.remove('hidden')`}
+                                class="bg-black/70 text-white px-3 py-1 rounded-lg text-sm flex items-center space-x-1"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                                </svg>
+                                <span>Ver completa</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Modal for full image -->
+                        <div
+                            id={`modal-${post.id}`}
+                            class="hidden fixed inset-0 bg-black/90 z-50 p-4"
+                            onclick={`document.getElementById('modal-${post.id}').classList.add('hidden')`}
+                        >
+                            <div class="w-full h-full flex items-center justify-center">
+                                <button
+                                    type="button"
+                                    class="absolute top-4 right-4 text-white hover:text-gray-300 transition"
+                                    onclick={`document.getElementById('modal-${post.id}').classList.add('hidden')`}
+                                >
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                                <img
+                                    src={post.imageUrl}
+                                    alt="Post image full"
+                                    class="max-w-full max-h-full object-contain"
+                                    onclick="event.stopPropagation()"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 )
             }
             <div class="mt-4 flex items-center space-x-4">
