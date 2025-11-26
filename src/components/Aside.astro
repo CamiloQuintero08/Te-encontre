@@ -1,59 +1,274 @@
 ---
-import InicioIcon from "./Icons/Inicio.astro"
-import BuscarIcon from "./Icons/Buscar.astro"
-import SugerenciasIcon from "./Icons/Sugerencias.astro"
-import AmigosIcon from "./Icons/Amigos.astro"
-import ConfigIcon from "./Icons/Config.astro"
+import InicioIcon from "./Icons/Inicio.astro";
+import BuscarIcon from "./Icons/Buscar.astro";
+import SugerenciasIcon from "./Icons/Sugerencias.astro";
+import AmigosIcon from "./Icons/Amigos.astro";
+import ConfigIcon from "./Icons/Config.astro";
+import { db } from "../db/client";
+import { users, messages } from "../db/schema";
+import { eq, or, and, desc } from "drizzle-orm";
+
+const currentUserId = Astro.cookies.get("user_id")?.number();
+
+let currentUser = null;
+let recentChats: any[] = [];
+let friendsList: any[] = [];
+
+if (currentUserId) {
+   // Get current user info
+   const userResult = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, currentUserId));
+
+   if (userResult.length > 0) {
+      currentUser = userResult[0];
+
+      // Get recent chats (last message with each user)
+      const allMessages = await db
+         .select({
+            id: messages.id,
+            senderId: messages.senderId,
+            receiverId: messages.receiverId,
+            content: messages.content,
+            createdAt: messages.createdAt,
+         })
+         .from(messages)
+         .where(
+            or(
+               eq(messages.senderId, currentUserId),
+               eq(messages.receiverId, currentUserId),
+            ),
+         )
+         .orderBy(desc(messages.createdAt));
+
+      // Get unique chat partners
+      const chatPartners = new Map();
+      for (const msg of allMessages) {
+         const partnerId =
+            msg.senderId === currentUserId ? msg.receiverId : msg.senderId;
+         if (!chatPartners.has(partnerId)) {
+            chatPartners.set(partnerId, msg);
+         }
+      }
+
+      // Get user info for each partner
+      const partnerIds = Array.from(chatPartners.keys());
+      if (partnerIds.length > 0) {
+         const partners = await db
+            .select()
+            .from(users)
+            .where(or(...partnerIds.map((id) => eq(users.id, id))));
+
+         recentChats = partners.slice(0, 5).map((partner) => {
+            const lastMsg = chatPartners.get(partner.id);
+            return {
+               id: partner.id,
+               name: partner.name,
+               photo: partner.photo,
+               lastMessage:
+                  lastMsg.content.substring(0, 30) +
+                  (lastMsg.content.length > 30 ? "..." : ""),
+            };
+         });
+      }
+
+      // Get friends list
+      const { friendships } = await import("../db/schema");
+      const allFriendships = await db
+         .select()
+         .from(friendships)
+         .where(
+            and(
+               or(
+                  eq(friendships.userId1, currentUserId),
+                  eq(friendships.userId2, currentUserId),
+               ),
+               eq(friendships.status, "accepted"),
+            ),
+         );
+
+      const friendIds = allFriendships.map((f) =>
+         f.userId1 === currentUserId ? f.userId2 : f.userId1,
+      );
+
+      if (friendIds.length > 0) {
+         const friends = await db
+            .select()
+            .from(users)
+            .where(or(...friendIds.map((id) => eq(users.id, id))));
+
+         friendsList = friends.map((friend) => ({
+            id: friend.id,
+            name: friend.name,
+            photo: friend.photo,
+         }));
+      }
+   }
+}
 ---
 
-<aside id="default-sidebar"
+<aside
+   id="default-sidebar"
    class="fixed top-0 left-0 z-40 w-64 h-full transition-transform -translate-x-full sm:translate-x-0"
-   aria-label="Sidebar">
+   aria-label="Sidebar"
+>
+   <div
+      class="h-full px-4 py-6 overflow-y-auto
+      bg-linear-to-b from-[#CAFF37] to-[#202A07]"
+   >
+      <h2 class="text-2xl text-white font-semibold mb-6">I Found U</h2>
 
-   <div class="h-full px-4 py-6 overflow-y-auto 
-      bg-linear-to-b from-[#CAFF37] to-[#202A07]">
-      <h2 class="text-2xl text-white font-semibold mb-8">I Found U</h2>
+      <!-- Current User Profile -->
+      {
+         currentUser && (
+            <div class="mb-6 pb-4 border-b border-white/20">
+               <a
+                  href="/profile"
+                  class="flex items-center space-x-3 p-3 bg-white/10 rounded-lg hover:bg-white/20 transition"
+               >
+                  <img
+                     src={
+                        currentUser.photo ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&size=48`
+                     }
+                     alt={currentUser.name}
+                     class="w-12 h-12 rounded-full object-cover border-2 border-white"
+                  />
+                  <div class="flex-1 min-w-0">
+                     <p class="text-white font-semibold truncate">
+                        {currentUser.name}
+                     </p>
+                     <p class="text-white/70 text-xs">Ver perfil</p>
+                  </div>
+               </a>
+            </div>
+         )
+      }
+
       <h3 class="text-white font-semibold mb-3">Descubrir</h3>
-      <ul class="space-y-3 mb-8">
+      <ul class="space-y-3 mb-6">
          <li>
-            <a href="#"
-               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white">
-               <InicioIcon class="size-5 mr-3"/>
+            <a
+               href="/"
+               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white"
+            >
+               <InicioIcon class="size-5 mr-3" />
                Inicio
             </a>
          </li>
          <li>
-            <a href="#"
-               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white">
-               <BuscarIcon class="size-5 mr-3 "/>
+            <button
+               id="boton-activar-busqueda"
+               class="flex items-center w-full px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white"
+            >
+               <BuscarIcon class="size-5 mr-3" />
                Buscar
-            </a>
+            </button>
          </li>
          <li>
-            <a href="#"
-               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white">
+            <a
+               href="#sugerencias"
+               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white"
+            >
                <SugerenciasIcon class="size-5 mr-3" />
                Sugerencias
             </a>
          </li>
+         <li>
+            <a
+               href="/requests"
+               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white"
+            >
+               <ConfigIcon class="size-5 mr-3" />
+               Solicitudes
+            </a>
+         </li>
       </ul>
+
+      <!-- Chats Section -->
+      {
+         recentChats.length > 0 && (
+            <>
+               <h3 class="text-white font-semibold mb-3">Chats</h3>
+               <ul class="space-y-2 mb-6">
+                  {recentChats.map((chat) => (
+                     <li>
+                        <a
+                           href={`/chat/${chat.id}`}
+                           class="flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition"
+                        >
+                           <img
+                              src={
+                                 chat.photo ||
+                                 `https://ui-avatars.com/api/?name=${encodeURIComponent(chat.name)}&size=32`
+                              }
+                              alt={chat.name}
+                              class="w-8 h-8 rounded-full object-cover"
+                           />
+                           <div class="flex-1 min-w-0">
+                              <p class="text-white text-sm font-medium truncate">
+                                 {chat.name}
+                              </p>
+                              <p class="text-white/60 text-xs truncate">
+                                 {chat.lastMessage}
+                              </p>
+                           </div>
+                        </a>
+                     </li>
+                  ))}
+               </ul>
+            </>
+         )
+      }
+
       <h3 class="text-white font-semibold mb-3">Biblioteca</h3>
+
+      <!-- Friends List -->
+      {
+         friendsList.length > 0 ? (
+            <>
+               <h4 class="text-white/80 text-sm font-medium mb-2 px-2">
+                  Amigos ({friendsList.length})
+               </h4>
+               <ul class="space-y-2 mb-4 max-h-60 overflow-y-auto">
+                  {friendsList.map((friend) => (
+                     <li>
+                        <a
+                           href={`/chat/${friend.id}`}
+                           class="flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition"
+                        >
+                           <img
+                              src={
+                                 friend.photo ||
+                                 `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.name)}&size=32`
+                              }
+                              alt={friend.name}
+                              class="w-8 h-8 rounded-full object-cover"
+                           />
+                           <p class="text-white text-sm font-medium truncate flex-1">
+                              {friend.name}
+                           </p>
+                        </a>
+                     </li>
+                  ))}
+               </ul>
+            </>
+         ) : (
+            <p class="text-white/60 text-sm px-2 mb-4">No tienes amigos aún</p>
+         )
+      }
+
       <ul class="space-y-3">
          <li>
-            <a href="#"
-               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white">
-               <AmigosIcon class="size-5 mr-3" />
-               Amigos
+            <a
+               href="/api/auth/logout"
+               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white"
+            >
+               <ConfigIcon class="size-5 mr-3" />
+               Cerrar Sesión
             </a>
          </li>
-         <li>
-            <a href="#"
-               class="flex items-center px-4 py-2 bg-white rounded-lg shadow text-neutral-800 hover:bg-black hover:text-white">
-               <ConfigIcon  class="size-5 mr-3"/>
-               Opciones
-            </a>
-         </li>
-
       </ul>
    </div>
 </aside>

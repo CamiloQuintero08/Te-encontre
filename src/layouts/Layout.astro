@@ -1,9 +1,14 @@
 ---
-import '../styles/global.css'
-import Aside from '../components/Aside.astro'
-import Content from '../components/Content.astro'
----
+import "../styles/global.css";
+import Aside from "../components/Aside.astro";
+import Search from "../components/Search.astro";
 
+interface Props {
+	showAside?: boolean;
+}
+
+const { showAside = true } = Astro.props;
+---
 
 <!doctype html>
 <html lang="en">
@@ -14,9 +19,10 @@ import Content from '../components/Content.astro'
 		<meta name="generator" content={Astro.generator} />
 		<title>Tenco</title>
 	</head>
-		<Aside />
+	{showAside && <Aside />}
 	<body>
-		<Content />
+		{showAside && <Search />}
+		<slot />
 	</body>
 </html>
 

@@ -1,79 +1,205 @@
 ---
-const sugerencias = [
-  {
-    nombre: "Nombre persona",
-    subtitulo: "Sugerencia/amigo",
-    img: "feo.jpg",
-    etiqueta: "Persona 1"
-  },
-  {
-    nombre: "Nombre persona",
-    subtitulo: "Sugerencia/amigo",
-    img: "Isa.jpg",
-    etiqueta: "Persona 2"
-  },
-  {
-    nombre: "Nombre persona",
-    subtitulo: "Sugerencia/amigo",
-    img: "Belita.jpg",
-    etiqueta: "Persona 3"
-  },
-  {
-    nombre: "Nombre persona",
-    subtitulo: "Sugerencia/amigo",
-    img: "ProfilePhoto.jpg",
-    etiqueta: "Persona 4"
-  }
-];
+import { db } from "../db/client";
+import { users, posts, likes, friendships, comments } from "../db/schema";
+import { desc, not, eq, sql, and, or } from "drizzle-orm";
+import CreatePost from "./CreatePost.astro";
+import PostCard from "./PostCard.astro";
 
-const amigos = [
-  { nombre: "Amigo 1", img: "Isa.jpg" },
-  { nombre: "Amigo 2", img: "/ProfilePhoto.jpg" },
-  { nombre: "Amigo 3", img: "Belita.jpg" },
-  { nombre: "Amigo 4", img: "feo.jpg" },
-  { nombre: "Amigo 5", img: "Isa.jpg" },
-  { nombre: "Amigo 6", img: "feo.jpg" },
-];
+// Obtener el ID del usuario actual de la cookie
+const currentUserId = Astro.cookies.get("user_id")?.number() || 0;
+
+// Get all friendships involving current user
+const allFriendships = await db
+  .select()
+  .from(friendships)
+  .where(
+    or(
+      eq(friendships.userId1, currentUserId),
+      eq(friendships.userId2, currentUserId),
+    ),
+  );
+
+// Get IDs of users who are friends (accepted) or have pending requests
+const friendIds = new Set<number>();
+const pendingIds = new Set<number>();
+
+allFriendships.forEach((f) => {
+  const otherId = f.userId1 === currentUserId ? f.userId2 : f.userId1;
+  if (f.status === "accepted") {
+    friendIds.add(otherId);
+  } else if (f.status === "pending") {
+    pendingIds.add(otherId);
+  }
+});
+
+// Get all users except current user
+const allUsers = await db
+  .select()
+  .from(users)
+  .where(not(eq(users.id, currentUserId)));
+
+// Filter suggestions: users who are NOT friends and have NO pending requests
+const sugerencias = allUsers
+  .filter((u) => !friendIds.has(u.id) && !pendingIds.has(u.id))
+  .slice(0, 4)
+  .map((u) => ({
+    id: u.id,
+    nombre: u.name,
+    subtitulo: "Sugerencia",
+    img: u.photo || "https://ui-avatars.com/api/?name=" + u.name,
+    etiqueta: u.name.split(" ")[0],
+  }));
+
+// Filter friends: users with accepted friendship
+const amigos = allUsers
+  .filter((u) => friendIds.has(u.id))
+  .map((u) => ({
+    id: u.id,
+    nombre: u.name,
+    img: u.photo || "https://ui-avatars.com/api/?name=" + u.name,
+  }));
+
+// Obtener posts con información del autor y likes
+const allPosts = await db
+  .select({
+    id: posts.id,
+    content: posts.content,
+    imageUrl: posts.imageUrl,
+    createdAt: posts.createdAt,
+    userId: posts.userId,
+    authorName: users.name,
+    authorPhoto: users.photo,
+  })
+  .from(posts)
+  .leftJoin(users, eq(posts.userId, users.id))
+  .orderBy(desc(posts.createdAt));
+
+// Para cada post, obtener el conteo de likes, comentarios y si el usuario actual le dio like
+const postsWithLikes = await Promise.all(
+  allPosts.map(async (post) => {
+    const likesCount = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(likes)
+      .where(eq(likes.postId, post.id));
+
+    const userLike = await db
+      .select()
+      .from(likes)
+      .where(and(eq(likes.postId, post.id), eq(likes.userId, currentUserId)));
+
+    // Get comments for this post
+    const postComments = await db
+      .select({
+        id: comments.id,
+        content: comments.content,
+        createdAt: comments.createdAt,
+        authorName: users.name,
+        authorPhoto: users.photo,
+      })
+      .from(comments)
+      .leftJoin(users, eq(comments.userId, users.id))
+      .where(eq(comments.postId, post.id))
+      .orderBy(comments.createdAt);
+
+    return {
+      id: post.id,
+      content: post.content,
+      imageUrl: post.imageUrl,
+      createdAt: post.createdAt!,
+      author: {
+        name: post.authorName!,
+        photo: post.authorPhoto,
+      },
+      likesCount: Number(likesCount[0]?.count || 0),
+      isLikedByUser: userLike.length > 0,
+      commentsCount: postComments.length,
+      comments: postComments.map((c) => ({
+        id: c.id,
+        content: c.content!,
+        createdAt: c.createdAt!,
+        author: {
+          name: c.authorName!,
+          photo: c.authorPhoto,
+        },
+      })),
+    };
+  }),
+);
 ---
 
-<main class="ml-[260px] px-8 py-10">
-  <div class="flex justify-between items-center mb-8">
+<main id="content" class="ml-[260px] px-8 py-10">
+  <!-- Posts Feed Section -->
+  <div class="mb-12">
+    <h1 class="text-3xl font-semibold mb-6">Feed</h1>
+    <CreatePost />
+    <div class="space-y-4">
+      {postsWithLikes.map((post) => <PostCard post={post} />)}
+    </div>
+  </div>
+
+  <!-- Suggestions Section -->
+  <div id="sugerencias" class="flex justify-between items-center mb-8">
     <div class="space-y-1">
       <h1 class="text-3xl font-semibold">Sugerencias</h1>
-      <p class="text-sm text-gray-500">Encuentra la persona con la que desees interactuar</p>
+      <p class="text-sm text-gray-500">
+        Encuentra la persona con la que desees interactuar
+      </p>
     </div>
-    <button class="bg-black text-white text-sm px-4 py-1 rounded-md hover:bg-gray-800 transition">
+    <button
+      class="bg-black text-white text-sm px-4 py-1 rounded-md hover:bg-gray-800 transition"
+    >
       Refrescar
     </button>
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-    {sugerencias.map((p) => (
-      <div class="w-full">
-        <div class="relative w-full h-48 rounded-lg overflow-hidden">
-          <img src={p.img} class="w-[232px] h-[232px] object-cover" />
-          <span class="absolute top-2 left-2 text-white font-medium text-lg drop-shadow">
-            {p.etiqueta}
-          </span>
+    {
+      sugerencias.map((p) => (
+        <div class="w-full">
+          <div class="relative w-full h-48 rounded-lg overflow-hidden">
+            <img src={p.img} class="w-[232px] h-[232px] object-cover" />
+            <span class="absolute top-2 left-2 text-white font-medium text-lg drop-shadow">
+              {p.etiqueta}
+            </span>
+          </div>
+
+          <p class="font-medium mt-3">{p.nombre}</p>
+          <p class="text-sm text-gray-500">{p.subtitulo}</p>
+          <form action="/api/friends/request" method="POST" class="mt-2">
+            <input type="hidden" name="friendId" value={p.id} />
+            <button
+              type="submit"
+              class="w-full bg-indigo-600 text-white text-sm px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+            >
+              Agregar amigo
+            </button>
+          </form>
         </div>
-
-        <p class="font-medium mt-3">{p.nombre}</p>
-        <p class="text-sm text-gray-500">{p.subtitulo}</p>
-      </div>
-    ))}
+      ))
+    }
   </div>
-  <h2 class="text-3xl font-semibold">Amigos</h2>
-  <p class="text-sm text-gray-500 mt-1 mb-6">Interactúa con las personas que sigues</p>
+  <div id="amigos">
+    <h2 class="text-3xl font-semibold">Amigos</h2>
+    <p class="text-sm text-gray-500 mt-1 mb-6">
+      Interactúa con las personas que sigues
+    </p>
 
-  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-    {amigos.map((a) => (
-      <div class="text-center">
-        <div class="w-full h-32 rounded-lg overflow-hidden">
-          <img src={a.img} class="w-[144px] h-[144px] object-cover" />
-        </div>
-        <p class="font-medium mt-2">{a.nombre}</p>
-      </div>
-    ))}
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+      {
+        amigos.map((a) => (
+          <div class="text-center">
+            <div class="w-full h-32 rounded-lg overflow-hidden">
+              <img src={a.img} class="w-[144px] h-[144px] object-cover" />
+            </div>
+            <p class="font-medium mt-2">{a.nombre}</p>
+            <a
+              href={`/chat/${a.id}`}
+              class="text-xs text-indigo-600 hover:text-indigo-800 mt-1 block"
+            >
+              Enviar mensaje
+            </a>
+          </div>
+        ))
+      }
+    </div>
   </div>
-
 </main>
-

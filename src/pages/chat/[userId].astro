@@ -1,0 +1,133 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { db } from "../../db/client";
+import { messages, users } from "../../db/schema";
+import { eq, or, and, desc } from "drizzle-orm";
+
+const currentUserId = Astro.cookies.get("user_id")?.number();
+const { userId } = Astro.params;
+const otherUserId = parseInt(userId || "0");
+
+if (!currentUserId) {
+    return Astro.redirect("/login");
+}
+
+if (!otherUserId) {
+    return Astro.redirect("/");
+}
+
+// Get other user info
+const otherUser = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, otherUserId));
+
+if (otherUser.length === 0) {
+    return Astro.redirect("/");
+}
+
+// Get messages between current user and other user
+const conversation = await db
+    .select()
+    .from(messages)
+    .where(
+        or(
+            and(
+                eq(messages.senderId, currentUserId),
+                eq(messages.receiverId, otherUserId),
+            ),
+            and(
+                eq(messages.senderId, otherUserId),
+                eq(messages.receiverId, currentUserId),
+            ),
+        ),
+    )
+    .orderBy(messages.createdAt);
+---
+
+<Layout>
+    <div class="ml-[260px] px-8 py-10">
+        <div class="max-w-4xl mx-auto">
+            <!-- Chat Header -->
+            <div
+                class="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center space-x-4"
+            >
+                <img
+                    src={otherUser[0].photo ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(otherUser[0].name)}`}
+                    alt={otherUser[0].name}
+                    class="w-12 h-12 rounded-full object-cover"
+                />
+                <div>
+                    <h2 class="text-xl font-semibold">{otherUser[0].name}</h2>
+                    <p class="text-sm text-gray-500">Chat</p>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div
+                class="bg-white rounded-lg shadow-md p-6 mb-4 min-h-[500px] max-h-[500px] overflow-y-auto"
+            >
+                <div class="space-y-4">
+                    {
+                        conversation.map((msg) => (
+                            <div
+                                class={`flex ${msg.senderId === currentUserId ? "justify-end" : "justify-start"}`}
+                            >
+                                <div
+                                    class={`max-w-xs px-4 py-2 rounded-lg ${
+                                        msg.senderId === currentUserId
+                                            ? "bg-indigo-600 text-white"
+                                            : "bg-gray-200 text-gray-900"
+                                    }`}
+                                >
+                                    <p class="whitespace-pre-wrap">
+                                        {msg.content}
+                                    </p>
+                                    <p
+                                        class={`text-xs mt-1 ${msg.senderId === currentUserId ? "text-indigo-200" : "text-gray-500"}`}
+                                    >
+                                        {new Date(
+                                            msg.createdAt!,
+                                        ).toLocaleTimeString("es-ES", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
+                                    </p>
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <form
+                    action="/api/messages/send"
+                    method="POST"
+                    class="flex space-x-4"
+                >
+                    <input
+                        type="hidden"
+                        name="receiverId"
+                        value={otherUserId}
+                    />
+                    <input
+                        type="text"
+                        name="content"
+                        placeholder="Escribe un mensaje..."
+                        required
+                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                    <button
+                        type="submit"
+                        class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition font-medium"
+                    >
+                        Enviar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</Layout>

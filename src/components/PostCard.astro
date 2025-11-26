@@ -1,0 +1,157 @@
+---
+interface Props {
+    post: {
+        id: number;
+        content: string;
+        imageUrl: string | null;
+        createdAt: Date;
+        author: {
+            name: string;
+            photo: string | null;
+        };
+        likesCount: number;
+        isLikedByUser: boolean;
+        commentsCount: number;
+        comments: Array<{
+            id: number;
+            content: string;
+            createdAt: Date;
+            author: {
+                name: string;
+                photo: string | null;
+            };
+        }>;
+    };
+}
+
+const { post } = Astro.props;
+---
+
+<div class="bg-white rounded-lg shadow-md p-6 mb-4">
+    <div class="flex items-start space-x-4">
+        <img
+            src={post.author.photo ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.name)}`}
+            alt={post.author.name}
+            class="w-12 h-12 rounded-full object-cover"
+        />
+        <div class="flex-1">
+            <div class="flex items-center justify-between">
+                <h3 class="font-semibold text-gray-900">{post.author.name}</h3>
+                <span class="text-sm text-gray-500">
+                    {
+                        new Date(post.createdAt).toLocaleDateString("es-ES", {
+                            day: "numeric",
+                            month: "short",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })
+                    }
+                </span>
+            </div>
+            <p class="mt-2 text-gray-700 whitespace-pre-wrap">{post.content}</p>
+            {
+                post.imageUrl && (
+                    <img
+                        src={post.imageUrl}
+                        alt="Post image"
+                        class="mt-4 rounded-lg max-h-96 w-full object-cover"
+                    />
+                )
+            }
+            <div class="mt-4 flex items-center space-x-4">
+                <form action="/api/posts/like" method="POST" class="inline">
+                    <input type="hidden" name="postId" value={post.id} />
+                    <button
+                        type="submit"
+                        class={`flex items-center space-x-2 px-4 py-2 rounded-lg transition ${
+                            post.isLikedByUser
+                                ? "bg-red-100 text-red-600 hover:bg-red-200"
+                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill={post.isLikedByUser ? "currentColor" : "none"}
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                            ></path>
+                        </svg>
+                        <span class="font-medium">{post.likesCount}</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="mt-6 border-t pt-4">
+                <h4 class="font-semibold text-gray-900 mb-3">
+                    Comentarios ({post.commentsCount})
+                </h4>
+
+                <!-- Comments List -->
+                <div class="space-y-3 mb-4">
+                    {
+                        post.comments.map((comment) => (
+                            <div class="flex space-x-3">
+                                <img
+                                    src={
+                                        comment.author.photo ||
+                                        `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author.name)}`
+                                    }
+                                    alt={comment.author.name}
+                                    class="w-8 h-8 rounded-full object-cover"
+                                />
+                                <div class="flex-1 bg-gray-100 rounded-lg px-3 py-2">
+                                    <p class="font-semibold text-sm">
+                                        {comment.author.name}
+                                    </p>
+                                    <p class="text-sm text-gray-700">
+                                        {comment.content}
+                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        {new Date(
+                                            comment.createdAt,
+                                        ).toLocaleDateString("es-ES", {
+                                            day: "numeric",
+                                            month: "short",
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
+                                    </p>
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
+
+                <!-- Add Comment Form -->
+                <form
+                    action="/api/comments/create"
+                    method="POST"
+                    class="flex space-x-2"
+                >
+                    <input type="hidden" name="postId" value={post.id} />
+                    <input
+                        type="text"
+                        name="content"
+                        placeholder="Escribe un comentario..."
+                        required
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                    />
+                    <button
+                        type="submit"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm font-medium"
+                    >
+                        Comentar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

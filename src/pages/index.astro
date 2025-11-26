@@ -1,8 +1,14 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Content from '../components/Content.astro';
+import Layout from "../layouts/Layout.astro";
+import Content from "../components/Content.astro";
+
+const currentUserId = Astro.cookies.get("user_id")?.number();
+
+if (!currentUserId) {
+    return Astro.redirect("/login");
+}
 ---
 
 <Layout>
-	
+    <Content />
 </Layout>
