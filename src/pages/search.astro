@@ -1,0 +1,151 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { searchUsers, filterUsers } from "../db/queries";
+
+const currentUserId = Astro.cookies.get("user_id")?.number();
+
+if (!currentUserId) {
+    return Astro.redirect("/login");
+}
+
+const query = Astro.url.searchParams.get("q") || "";
+const minAge = Astro.url.searchParams.get("minAge")
+    ? Number(Astro.url.searchParams.get("minAge"))
+    : undefined;
+const maxAge = Astro.url.searchParams.get("maxAge")
+    ? Number(Astro.url.searchParams.get("maxAge"))
+    : undefined;
+const location = Astro.url.searchParams.get("location") || "";
+
+let results: Awaited<ReturnType<typeof searchUsers>> = [];
+
+if (query) {
+    results = await searchUsers(query);
+} else if (minAge || maxAge || location) {
+    results = await filterUsers({ minAge, maxAge, location });
+}
+---
+
+<Layout>
+    <div class="ml-[260px] px-8 py-10">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-semibold mb-6">Buscar Personas</h1>
+
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <form method="GET" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Nombre</label
+                            >
+                            <input
+                                type="text"
+                                name="q"
+                                value={query}
+                                placeholder="Buscar por nombre..."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Ubicación</label
+                            >
+                            <input
+                                type="text"
+                                name="location"
+                                value={location}
+                                placeholder="Ciudad, País..."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Edad Mínima</label
+                            >
+                            <input
+                                type="number"
+                                name="minAge"
+                                value={minAge}
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-1"
+                                >Edad Máxima</label
+                            >
+                            <input
+                                type="number"
+                                name="maxAge"
+                                value={maxAge}
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button
+                            type="submit"
+                            class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition"
+                            >Buscar</button
+                        >
+                    </div>
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {
+                    results.map((user) => (
+                        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                            <img
+                                src={
+                                    user.photo ||
+                                    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`
+                                }
+                                alt={user.name}
+                                class="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
+                            />
+                            <h3 class="text-xl font-semibold">{user.name}</h3>
+                            <p class="text-gray-500 text-sm">
+                                {user.location || "Sin ubicación"}
+                            </p>
+                            <p class="text-gray-400 text-xs mt-1">
+                                {user.age
+                                    ? `${user.age} años`
+                                    : "Edad no especificada"}
+                            </p>
+
+                            <form
+                                action="/api/friends/request"
+                                method="POST"
+                                class="mt-4"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="friendId"
+                                    value={user.id}
+                                />
+                                <button
+                                    type="submit"
+                                    class="bg-lime-300 text-black px-4 py-2 rounded-lg hover:bg-lime-500 transition text-sm font-medium w-full"
+                                >
+                                    Agregar amigo
+                                </button>
+                            </form>
+                        </div>
+                    ))
+                }
+                {
+                    results.length === 0 &&
+                        (query || minAge || maxAge || location) && (
+                            <p class="col-span-full text-center text-gray-500">
+                                No se encontraron resultados.
+                            </p>
+                        )
+                }
+            </div>
+        </div>
+    </div>
+</Layout>

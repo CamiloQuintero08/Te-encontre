@@ -6,6 +6,7 @@ interface Props {
         imageUrl: string | null;
         createdAt: Date;
         author: {
+            id: number;
             name: string;
             photo: string | null;
         };
@@ -17,6 +18,7 @@ interface Props {
             content: string;
             createdAt: Date;
             author: {
+                id: number;
                 name: string;
                 photo: string | null;
             };
@@ -25,6 +27,8 @@ interface Props {
 }
 
 const { post } = Astro.props;
+const currentUserId = Astro.cookies.get("user_id")?.number();
+const isAuthor = currentUserId === post.author.id;
 ---
 
 <div class="bg-white rounded-lg shadow-md p-6 mb-4">
@@ -38,16 +42,83 @@ const { post } = Astro.props;
         <div class="flex-1">
             <div class="flex items-center justify-between">
                 <h3 class="font-semibold text-gray-900">{post.author.name}</h3>
-                <span class="text-sm text-gray-500">
-                    {
-                        new Date(post.createdAt).toLocaleDateString("es-ES", {
-                            day: "numeric",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        })
-                    }
-                </span>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-500">
+                        {
+                            new Date(post.createdAt).toLocaleDateString("es-ES", {
+                                day: "numeric",
+                                month: "short",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })
+                        }
+                    </span>
+                    {isAuthor && (
+                        <div class="relative">
+                            <button 
+                                type="button" 
+                                class="text-gray-400 hover:text-gray-600 peer"
+                                onclick="this.nextElementSibling.classList.toggle('hidden')"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                </svg>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden hover:block peer-focus:block z-20 border border-gray-100">
+                                <div class="py-1">
+                                    <button 
+                                        type="button"
+                                        onclick={`document.getElementById('edit-post-${post.id}').classList.remove('hidden')`}
+                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    >
+                                        Editar
+                                    </button>
+                                    <form action="/api/posts/delete" method="POST" class="w-full">
+                                        <input type="hidden" name="postId" value={post.id} />
+                                        <button 
+                                            type="submit" 
+                                            onclick="return confirm('¿Estás seguro de eliminar esta publicación?');"
+                                            class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+            
+            {/* Edit Modal */}
+            <div id={`edit-post-${post.id}`} class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+                <div class="bg-white rounded-lg p-6 w-full max-w-lg mx-4">
+                    <h3 class="text-lg font-semibold mb-4">Editar Publicación</h3>
+                    <form action="/api/posts/edit" method="POST">
+                        <input type="hidden" name="postId" value={post.id} />
+                        <textarea
+                            name="content"
+                            rows="4"
+                            class="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:ring-2 focus:ring-indigo-500"
+                            required
+                        >{post.content}</textarea>
+                        <div class="flex justify-end space-x-2">
+                            <button 
+                                type="button"
+                                onclick={`document.getElementById('edit-post-${post.id}').classList.add('hidden')`}
+                                class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                            >
+                                Cancelar
+                            </button>
+                            <button 
+                                type="submit"
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                            >
+                                Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
             <p class="mt-2 text-gray-700 whitespace-pre-wrap">{post.content}</p>
             {
@@ -138,7 +209,7 @@ const { post } = Astro.props;
                 <div class="space-y-3 mb-4">
                     {
                         post.comments.map((comment) => (
-                            <div class="flex space-x-3">
+                            <div class="flex space-x-3 group/comment">
                                 <img
                                     src={
                                         comment.author.photo ||
@@ -147,10 +218,28 @@ const { post } = Astro.props;
                                     alt={comment.author.name}
                                     class="w-8 h-8 rounded-full object-cover"
                                 />
-                                <div class="flex-1 bg-gray-100 rounded-lg px-3 py-2">
-                                    <p class="font-semibold text-sm">
-                                        {comment.author.name}
-                                    </p>
+                                <div class="flex-1 bg-gray-100 rounded-lg px-3 py-2 relative">
+                                    <div class="flex justify-between items-start">
+                                        <p class="font-semibold text-sm">
+                                            {comment.author.name}
+                                        </p>
+                                        {currentUserId === comment.author.id && (
+                                            <div class="flex space-x-2 opacity-0 group-hover/comment:opacity-100 transition">
+                                                <button 
+                                                    onclick={`document.getElementById('edit-comment-${comment.id}').classList.remove('hidden')`}
+                                                    class="text-xs text-gray-500 hover:text-gray-700"
+                                                >
+                                                    Editar
+                                                </button>
+                                                <form action="/api/comments/delete" method="POST" onsubmit="return confirm('¿Eliminar comentario?');" class="inline">
+                                                    <input type="hidden" name="commentId" value={comment.id} />
+                                                    <button type="submit" class="text-xs text-red-500 hover:text-red-700">
+                                                        Eliminar
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        )}
+                                    </div>
                                     <p class="text-sm text-gray-700">
                                         {comment.content}
                                     </p>
@@ -164,6 +253,28 @@ const { post } = Astro.props;
                                             minute: "2-digit",
                                         })}
                                     </p>
+                                    
+                                    {/* Edit Comment Modal/Form Inline */}
+                                    <div id={`edit-comment-${comment.id}`} class="hidden absolute inset-0 bg-white z-10 p-1 rounded-lg">
+                                        <form action="/api/comments/edit" method="POST" class="flex h-full">
+                                            <input type="hidden" name="commentId" value={comment.id} />
+                                            <input 
+                                                type="text" 
+                                                name="content" 
+                                                value={comment.content}
+                                                class="flex-1 text-sm border-none focus:ring-0 bg-transparent"
+                                                required
+                                            />
+                                            <button type="submit" class="text-xs text-indigo-600 font-medium px-2">Guardar</button>
+                                            <button 
+                                                type="button" 
+                                                onclick={`document.getElementById('edit-comment-${comment.id}').classList.add('hidden')`}
+                                                class="text-xs text-gray-500 px-2"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         ))

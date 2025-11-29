@@ -72,10 +72,10 @@ const conversation = await db
                     {
                         conversation.map((msg) => (
                             <div
-                                class={`flex ${msg.senderId === currentUserId ? "justify-end" : "justify-start"}`}
+                                class={`flex ${msg.senderId === currentUserId ? "justify-end" : "justify-start"} group/message`}
                             >
                                 <div
-                                    class={`max-w-xs px-4 py-2 rounded-lg ${
+                                    class={`max-w-xs px-4 py-2 rounded-lg relative ${
                                         msg.senderId === currentUserId
                                             ? "bg-lime-300 text-black"
                                             : "bg-gray-200 text-gray-900"
@@ -84,16 +84,86 @@ const conversation = await db
                                     <p class="whitespace-pre-wrap">
                                         {msg.content}
                                     </p>
-                                    <p
-                                        class={`text-xs mt-1 ${msg.senderId === currentUserId ? "text-lime-500" : "text-gray-500"}`}
+                                    <div class="flex items-center justify-between mt-1">
+                                        <p
+                                            class={`text-xs ${msg.senderId === currentUserId ? "text-lime-500" : "text-gray-500"}`}
+                                        >
+                                            {new Date(
+                                                msg.createdAt!,
+                                            ).toLocaleTimeString("es-ES", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            })}
+                                        </p>
+                                        {msg.senderId === currentUserId && (
+                                            <div class="flex space-x-2 opacity-0 group-hover/message:opacity-100 transition ml-2">
+                                                <button
+                                                    onclick={`document.getElementById('edit-msg-${msg.id}').classList.remove('hidden')`}
+                                                    class="text-xs text-gray-600 hover:text-gray-800"
+                                                >
+                                                    Editar
+                                                </button>
+                                                <form
+                                                    action="/api/messages/delete"
+                                                    method="POST"
+                                                    onsubmit="return confirm('¿Eliminar mensaje?');"
+                                                    class="inline"
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="messageId"
+                                                        value={msg.id}
+                                                    />
+                                                    <button
+                                                        type="submit"
+                                                        class="text-xs text-red-600 hover:text-red-800"
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Edit Message Inline */}
+                                    <div
+                                        id={`edit-msg-${msg.id}`}
+                                        class="hidden absolute inset-0 bg-white rounded-lg p-2 z-10"
                                     >
-                                        {new Date(
-                                            msg.createdAt!,
-                                        ).toLocaleTimeString("es-ES", {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                        })}
-                                    </p>
+                                        <form
+                                            action="/api/messages/edit"
+                                            method="POST"
+                                            class="flex flex-col h-full"
+                                        >
+                                            <input
+                                                type="hidden"
+                                                name="messageId"
+                                                value={msg.id}
+                                            />
+                                            <textarea
+                                                name="content"
+                                                class="flex-1 text-sm border border-gray-300 rounded p-1 mb-2 focus:ring-1 focus:ring-indigo-500"
+                                                required
+                                            >
+                                                {msg.content}
+                                            </textarea>
+                                            <div class="flex justify-end space-x-2">
+                                                <button
+                                                    type="submit"
+                                                    class="text-xs bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
+                                                >
+                                                    Guardar
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onclick={`document.getElementById('edit-msg-${msg.id}').classList.add('hidden')`}
+                                                    class="text-xs bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         ))

@@ -1,0 +1,72 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getUsageStats } from "../db/queries";
+import { db } from "../db/client";
+import { sql } from "drizzle-orm";
+
+const currentUserId = Astro.cookies.get("user_id")?.number();
+
+if (!currentUserId) {
+    return Astro.redirect("/login");
+}
+
+const usageStats = await getUsageStats();
+
+// Get network stats from view
+const networkStatsResult = await db.execute(sql`SELECT * FROM network_stats`);
+// @ts-ignore
+const networkStats = networkStatsResult[0][0];
+---
+
+<Layout>
+    <div class="ml-[260px] px-8 py-10">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-semibold mb-6">Estadísticas de la Red</h1>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-gray-500 text-sm font-medium">Usuarios Totales</h3>
+                    <p class="text-3xl font-bold text-indigo-600 mt-2">{networkStats.total_users}</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-gray-500 text-sm font-medium">Publicaciones</h3>
+                    <p class="text-3xl font-bold text-pink-600 mt-2">{networkStats.total_posts}</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-gray-500 text-sm font-medium">Comentarios</h3>
+                    <p class="text-3xl font-bold text-yellow-600 mt-2">{networkStats.total_comments}</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-gray-500 text-sm font-medium">Me gusta</h3>
+                    <p class="text-3xl font-bold text-red-600 mt-2">{networkStats.total_likes}</p>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-semibold mb-6">Actividad Diaria (Últimos 30 días)</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                {usageStats.dailyPosts.length > 0 ? (
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Publicaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {usageStats.dailyPosts.map((stat) => (
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{stat.date}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{stat.count}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p class="text-gray-500">No hay actividad reciente.</p>
+                )}
+            </div>
+        </div>
+    </div>
+</Layout>

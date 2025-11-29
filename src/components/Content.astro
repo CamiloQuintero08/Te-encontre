@@ -93,6 +93,7 @@ const postsWithLikes = await Promise.all(
         id: comments.id,
         content: comments.content,
         createdAt: comments.createdAt,
+        userId: comments.userId,
         authorName: users.name,
         authorPhoto: users.photo,
       })
@@ -107,6 +108,7 @@ const postsWithLikes = await Promise.all(
       imageUrl: post.imageUrl,
       createdAt: post.createdAt!,
       author: {
+        id: post.userId,
         name: post.authorName!,
         photo: post.authorPhoto,
       },
@@ -118,6 +120,7 @@ const postsWithLikes = await Promise.all(
         content: c.content!,
         createdAt: c.createdAt!,
         author: {
+          id: c.userId,
           name: c.authorName!,
           photo: c.authorPhoto,
         },

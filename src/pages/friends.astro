@@ -1,0 +1,100 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getUserFriends } from "../db/queries";
+import { db } from "../db/client";
+import { sql } from "drizzle-orm";
+
+const currentUserId = Astro.cookies.get("user_id")?.number();
+
+if (!currentUserId) {
+    return Astro.redirect("/login");
+}
+
+const friends = await getUserFriends(currentUserId);
+
+// Handle notification
+if (Astro.request.method === "POST") {
+    const formData = await Astro.request.formData();
+    const message = formData.get("message")?.toString();
+
+    if (message) {
+        await db.execute(
+            sql`CALL sp_notify_friends(${currentUserId}, ${message})`,
+        );
+    }
+}
+---
+
+<Layout>
+    <div class="ml-[260px] px-8 py-10">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-semibold">Mis Amigos</h1>
+                <a
+                    href="/requests"
+                    class="text-indigo-600 hover:text-indigo-800"
+                    >Ver Solicitudes Pendientes</a
+                >
+            </div>
+
+            <!-- Notify Friends Section -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <h2 class="text-xl font-semibold mb-4">
+                    Notificar a todos los amigos
+                </h2>
+                <form method="POST" class="flex gap-4">
+                    <input
+                        type="text"
+                        name="message"
+                        placeholder="Escribe un mensaje para tus amigos..."
+                        required
+                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                    />
+                    <button
+                        type="submit"
+                        class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition"
+                        >Enviar Notificación</button
+                    >
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {
+                    friends.map((friend) => (
+                        <div class="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                            <img
+                                src={
+                                    friend.friendPhoto ||
+                                    `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.friendName)}`
+                                }
+                                alt={friend.friendName}
+                                class="w-16 h-16 rounded-full object-cover"
+                            />
+                            <div>
+                                <h3 class="font-semibold text-lg">
+                                    {friend.friendName}
+                                </h3>
+                                <p class="text-gray-500 text-sm">
+                                    {friend.friendEmail}
+                                </p>
+                                <a
+                                    href={`/chat/${friend.friendId}`}
+                                    class="text-xs text-indigo-600 hover:text-indigo-800 mt-1 block"
+                                >
+                                    Enviar mensaje
+                                </a>
+                            </div>
+                        </div>
+                    ))
+                }
+                {
+                    friends.length === 0 && (
+                        <p class="col-span-full text-center text-gray-500">
+                            Aún no tienes amigos agregados.
+                        </p>
+                    )
+                }
+            </div>
+        </div>
+    </div>
+</Layout>
