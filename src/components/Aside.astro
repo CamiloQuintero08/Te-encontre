@@ -115,11 +115,9 @@ if (currentUserId) {
 >
    <div
       class="h-full px-4 py-6 overflow-y-auto
-      bg-linear-to-b from-[#CAFF37] to-[#202A07]"
+      bg-linear-to-b from-orange-600 to-yellow-400"
    >
-      <h2 class="text-2xl text-black font-semibold mb-6">I Found U</h2>
-
-      <!-- Current User Profile -->
+      <h2 class="text-2xl text-white font-bold mb-6">I Found U</h2>
       {
          currentUser && (
             <div class="mb-6 pb-4 border-b border-white/20">
@@ -185,8 +183,6 @@ if (currentUserId) {
             </a>
          </li>
       </ul>
-
-      <!-- Chats Section -->
       {
          recentChats.length > 0 && (
             <>
@@ -196,7 +192,7 @@ if (currentUserId) {
                      <li>
                         <a
                            href={`/chat/${chat.id}`}
-                           class="flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition"
+                           class="flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg hover:bg-orange-700/20 transition"
                         >
                            <img
                               src={
@@ -223,8 +219,6 @@ if (currentUserId) {
       }
 
       <h3 class="text-white font-semibold mb-3">Biblioteca</h3>
-
-      <!-- Friends List -->
       {
          friendsList.length > 0 ? (
             <>
@@ -236,7 +230,7 @@ if (currentUserId) {
                      <li>
                         <a
                            href={`/chat/${friend.id}`}
-                           class="flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition"
+                           class="flex items-center space-x-2 px-3 py-2 bg-white/10 rounded-lg hover:bg-yellow-600/20 transition"
                         >
                            <img
                               src={
