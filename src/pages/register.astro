@@ -3,13 +3,21 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout showAside={false}>
-    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div
+        class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-linear-to-b from-orange-500 to-yellow-500"
+    >
         <div class="sm:mx-auto sm:w-full sm:max-w-sm">
             <h2
-                class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900"
+                class="mt-10 text-center text-3xl font-bold leading-9 tracking-tight text-black"
             >
                 Crea tu cuenta
             </h2>
+            <h3 class="text-center font-semibold">
+                Y se parte de la familia <span
+                    class="font-bold text-yellow-500 text-shadow-lg text-shadow-red-600"
+                    >I found you</span
+                >
+            </h3>
         </div>
 
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -17,7 +25,7 @@ import Layout from "../layouts/Layout.astro";
                 <div>
                     <label
                         for="name"
-                        class="block text-sm font-medium leading-6 text-gray-900"
+                        class="block text-sm font-medium leading-6 text-black"
                         >Nombre completo</label
                     >
                     <div class="mt-2">
@@ -26,7 +34,7 @@ import Layout from "../layouts/Layout.astro";
                             name="name"
                             type="text"
                             required
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                            class="block w-full rounded-md border-0 py-1.5 bg-white text-black ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3 shadow-lg shadow-black/50"
                         />
                     </div>
                 </div>
@@ -34,7 +42,7 @@ import Layout from "../layouts/Layout.astro";
                 <div>
                     <label
                         for="email"
-                        class="block text-sm font-medium leading-6 text-gray-900"
+                        class="block text-sm font-medium leading-6 text-black"
                         >Correo electrónico</label
                     >
                     <div class="mt-2">
@@ -44,7 +52,7 @@ import Layout from "../layouts/Layout.astro";
                             type="email"
                             autocomplete="email"
                             required
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                            class="block w-full rounded-md border-0 py-1.5 bg-white text-black ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3 shadow-lg shadow-black/50"
                         />
                     </div>
                 </div>
@@ -52,7 +60,7 @@ import Layout from "../layouts/Layout.astro";
                 <div>
                     <label
                         for="password"
-                        class="block text-sm font-medium leading-6 text-gray-900"
+                        class="block text-sm font-medium leading-6 text-black"
                         >Contraseña</label
                     >
                     <div class="mt-2">
@@ -61,7 +69,7 @@ import Layout from "../layouts/Layout.astro";
                             name="password"
                             type="password"
                             required
-                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 px-3"
+                            class="block w-full rounded-md border-0 py-1.5 bg-white text-black ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3 shadow-lg shadow-black/50"
                         />
                     </div>
                 </div>
@@ -69,18 +77,18 @@ import Layout from "../layouts/Layout.astro";
                 <div>
                     <button
                         type="submit"
-                        class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        class="flex w-full justify-center rounded-md bg-yellow-500 px-3 py-1.5 font-semibold leading-6 text-black shadow-sm hover:bg-orange-500 hover:text-white hover:shadow-lg hover:shadow-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         >Registrarse</button
                     >
                 </div>
             </form>
 
-            <p class="mt-10 text-center text-sm text-gray-500">
+            <p class="mt-10 text-center text-sm text-white">
                 ¿Ya tienes cuenta?
                 <a
                     href="/login"
-                    class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-                    >Inicia sesión</a
+                    class="font-semibold leading-6 text-black hover:text-red-600"
+                    >Inicia sesión ahora!</a
                 >
             </p>
         </div>
