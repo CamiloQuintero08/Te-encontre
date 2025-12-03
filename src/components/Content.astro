@@ -122,10 +122,10 @@ const postsWithLikes = await Promise.all(
 
 <main
   id="content"
-  class="ml-[260px] px-8 py-10 bg-linear-to-b from-black/70 to-white/50"
+  class="ml-[260px] px-8 py-10 bg-linear-to-b from-blue-200 to-white"
 >
   <div class="mb-12">
-    <h1 class="text-3xl font-semibold mb-6 text-white/70">Feed</h1>
+    <h1 class="text-3xl font-bold mb-6 text-orange-500">Feed</h1>
     <CreatePost />
     <div class="space-y-4">
       {postsWithLikes.map((post) => <PostCard post={post} />)}
@@ -133,7 +133,7 @@ const postsWithLikes = await Promise.all(
   </div>
   <div id="sugerencias" class="flex justify-between items-center mb-8">
     <div class="space-y-1">
-      <h1 class="text-3xl font-semibold">Sugerencias</h1>
+      <h1 class="text-3xl font-bold text-orange-500">Sugerencias</h1>
       <p class="text-sm text-gray-500">
         Encuentra la persona con la que desees interactuar
       </p>
@@ -171,7 +171,7 @@ const postsWithLikes = await Promise.all(
     }
   </div>
   <div id="amigos">
-    <h2 class="text-3xl font-semibold">Amigos</h2>
+    <h2 class="text-3xl font-bold text-orange-500">Amigos</h2>
     <p class="text-sm text-gray-500 mt-1 mb-6">
       Interactúa con las personas que sigues
     </p>

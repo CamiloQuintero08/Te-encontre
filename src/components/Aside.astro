@@ -15,7 +15,7 @@ let recentChats: any[] = [];
 let friendsList: any[] = [];
 
 if (currentUserId) {
-   // Get current user info
+   
    const userResult = await db
       .select()
       .from(users)
@@ -24,7 +24,7 @@ if (currentUserId) {
    if (userResult.length > 0) {
       currentUser = userResult[0];
 
-      // Get recent chats (last message with each user)
+      
       const allMessages = await db
          .select({
             id: messages.id,
@@ -42,7 +42,7 @@ if (currentUserId) {
          )
          .orderBy(desc(messages.createdAt));
 
-      // Get unique chat partners
+      
       const chatPartners = new Map();
       for (const msg of allMessages) {
          const partnerId =
@@ -52,7 +52,7 @@ if (currentUserId) {
          }
       }
 
-      // Get user info for each partner
+      
       const partnerIds = Array.from(chatPartners.keys());
       if (partnerIds.length > 0) {
          const partners = await db
@@ -73,7 +73,7 @@ if (currentUserId) {
          });
       }
 
-      // Get friends list
+      
       const { friendships } = await import("../db/schema");
       const allFriendships = await db
          .select()
@@ -115,9 +115,9 @@ if (currentUserId) {
 >
    <div
       class="h-full px-4 py-6 overflow-y-auto
-      bg-linear-to-b from-orange-600 to-yellow-400"
+      bg-linear-to-b from-blue-800 to-cyan-400"
    >
-      <h2 class="text-2xl text-white font-bold mb-6">I Found U</h2>
+      <h2 class="text-2xl bg-linear-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent font-bold mb-6">I Found U</h2>
       {
          currentUser && (
             <div class="mb-6 pb-4 border-b border-white/20">
