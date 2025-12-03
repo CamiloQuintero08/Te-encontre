@@ -30,9 +30,11 @@ const pendingRequests = await db
 ---
 
 <Layout>
-    <div class="ml-[260px] px-8 py-10">
+    <div class="ml-[260px] px-8 py-10 bg-linear-to-b from-black/70 to-white/50">
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-3xl font-semibold mb-6">Solicitudes de Amistad</h1>
+            <h1 class="text-3xl font-semibold mb-6 text-white/70">
+                Solicitudes de Amistad
+            </h1>
 
             {
                 pendingRequests.length === 0 ? (

@@ -4,15 +4,17 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout showAside={false}>
     <div
-        class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-linear-to-b from-orange-500 to-yellow-500"
+        class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-linear-to-b from-white/50 to-black/70"
     >
         <div class="sm:mx-auto sm:w-full sm:max-w-sm">
             <h2
-                class="mt-10 text-center text-3xl font-bold leading-9 tracking-tight text-black"
+                class="mt-10 mb-5 text-center text-4xl font-bold bg-linear-to-r from-orange-700 to-yellow-600 bg-clip-text text-transparent"
             >
-                Crea tu cuenta
+                Crea tu cuenta ahora
             </h2>
-            <h3 class="text-center font-semibold">
+            <h3
+                class="t-10 text-center text-xl font-bold leading-4 tracking-tight text-black/80 text-shadow-lg text-shadow-white/50"
+            >
                 Y se parte de la familia <span
                     class="font-bold text-yellow-500 text-shadow-lg text-shadow-red-600"
                     >I found you</span
@@ -87,7 +89,7 @@ import Layout from "../layouts/Layout.astro";
                 ¿Ya tienes cuenta?
                 <a
                     href="/login"
-                    class="font-semibold leading-6 text-black hover:text-red-600"
+                    class="font-semibold leading-6 text-black hover:text-red-600 hover:underline hover:decoration-red-600"
                     >Inicia sesión ahora!</a
                 >
             </p>

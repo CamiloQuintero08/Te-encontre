@@ -5,10 +5,7 @@ import { desc, not, eq, sql, and, or } from "drizzle-orm";
 import CreatePost from "./CreatePost.astro";
 import PostCard from "./PostCard.astro";
 
-// Obtener el ID del usuario actual de la cookie
 const currentUserId = Astro.cookies.get("user_id")?.number() || 0;
-
-// Get all friendships involving current user
 const allFriendships = await db
   .select()
   .from(friendships)
@@ -19,7 +16,6 @@ const allFriendships = await db
     ),
   );
 
-// Get IDs of users who are friends (accepted) or have pending requests
 const friendIds = new Set<number>();
 const pendingIds = new Set<number>();
 
@@ -32,13 +28,11 @@ allFriendships.forEach((f) => {
   }
 });
 
-// Get all users except current user
 const allUsers = await db
   .select()
   .from(users)
   .where(not(eq(users.id, currentUserId)));
 
-// Filter suggestions: users who are NOT friends and have NO pending requests
 const sugerencias = allUsers
   .filter((u) => !friendIds.has(u.id) && !pendingIds.has(u.id))
   .slice(0, 4)
@@ -50,7 +44,6 @@ const sugerencias = allUsers
     etiqueta: u.name.split(" ")[0],
   }));
 
-// Filter friends: users with accepted friendship
 const amigos = allUsers
   .filter((u) => friendIds.has(u.id))
   .map((u) => ({
@@ -59,7 +52,6 @@ const amigos = allUsers
     img: u.photo || "https://ui-avatars.com/api/?name=" + u.name,
   }));
 
-// Obtener posts con información del autor y likes
 const allPosts = await db
   .select({
     id: posts.id,
@@ -74,7 +66,6 @@ const allPosts = await db
   .leftJoin(users, eq(posts.userId, users.id))
   .orderBy(desc(posts.createdAt));
 
-// Para cada post, obtener el conteo de likes, comentarios y si el usuario actual le dio like
 const postsWithLikes = await Promise.all(
   allPosts.map(async (post) => {
     const likesCount = await db
@@ -87,7 +78,6 @@ const postsWithLikes = await Promise.all(
       .from(likes)
       .where(and(eq(likes.postId, post.id), eq(likes.userId, currentUserId)));
 
-    // Get comments for this post
     const postComments = await db
       .select({
         id: comments.id,
@@ -130,17 +120,17 @@ const postsWithLikes = await Promise.all(
 );
 ---
 
-<main id="content" class="ml-[260px] px-8 py-10">
-  <!-- Posts Feed Section -->
+<main
+  id="content"
+  class="ml-[260px] px-8 py-10 bg-linear-to-b from-black/70 to-white/50"
+>
   <div class="mb-12">
-    <h1 class="text-3xl font-semibold mb-6">Feed</h1>
+    <h1 class="text-3xl font-semibold mb-6 text-white/70">Feed</h1>
     <CreatePost />
     <div class="space-y-4">
       {postsWithLikes.map((post) => <PostCard post={post} />)}
     </div>
   </div>
-
-  <!-- Suggestions Section -->
   <div id="sugerencias" class="flex justify-between items-center mb-8">
     <div class="space-y-1">
       <h1 class="text-3xl font-semibold">Sugerencias</h1>

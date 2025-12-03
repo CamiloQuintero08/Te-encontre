@@ -4,18 +4,18 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout showAside={false}>
     <div
-        class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-linear-to-b from-orange-500 to-yellow-500"
+        class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-linear-to-b from-black/70 to-white/50"
     >
         <div class="sm:mx-auto sm:w-full sm:max-w-sm">
             <h2
-                class="text-center text-3xl font-bold leading-2 tracking-tight text-black text-shadow-lg text-shadow-red-600"
+                class="text-center text-5xl font-bold bg-linear-to-r from-yellow-500 to-orange-700 bg-clip-text text-transparent"
             >
                 Bienvenid@s a I Found You
             </h2>
             <h2
-                class="mt-10 text-center text-xl font-semibold leading-4 tracking-tight text-black text-shadow-lg text-shadow-yellow-400"
+                class="mt-10 text-center text-xl font-bold leading-4 tracking-tight text-black/80 text-shadow-lg text-shadow-white/50"
             >
-                Inicia sesión en tu cuenta ahora
+                ¡Inicia sesión en tu cuenta ahora!
             </h2>
         </div>
 
@@ -34,7 +34,7 @@ import Layout from "../layouts/Layout.astro";
                             type="email"
                             autocomplete="email"
                             required
-                            class="block w-full rounded-md border-0 py-1.5 bg-amber-50 text-black ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3 shadow-lg shadow-black/50"
+                            class="block w-full rounded-md border-0 py-1.5 bg-white text-black ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3 shadow-lg shadow-black/50"
                         />
                     </div>
                 </div>
@@ -72,7 +72,7 @@ import Layout from "../layouts/Layout.astro";
                     ¿No tienes cuenta?
                     <a
                         href="/register"
-                        class="font-semibold leading-6 text-black hover:text-red-600"
+                        class="font-semibold leading-6 text-black hover:text-red-600 hover:underline hover:decoration-red-600"
                         >Regístrate aquí</a
                     >
                 </p>

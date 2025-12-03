@@ -31,12 +31,11 @@ const posts = userPosts[0] as unknown as any[];
 ---
 
 <Layout>
-    <div class="ml-[260px] px-8 py-10">
+    <div class="ml-[260px] px-8 py-10 bg-linear-to-b from-black/70 to-white/50">
         <div class="max-w-2xl mx-auto">
-            <h1 class="text-3xl font-semibold mb-6">Mi Perfil</h1>
+            <h1 class="text-3xl font-semibold mb-6 text-white/70">Mi Perfil</h1>
 
             <div class="bg-white rounded-lg shadow-md p-6">
-                <!-- Current Profile Photo -->
                 <div class="flex items-center space-x-6 mb-6">
                     <img
                         src={user.photo ||
