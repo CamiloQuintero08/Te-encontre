@@ -1,46 +1,32 @@
-# Astro Starter Kit: Basics
+# Te-encontre
+Proyecto final para la asignatura de bases de datos1
 
-```sh
-npm create astro@latest -- --template basics
-```
+## Descripción
+Proyecto basado en la creacion de una red social donde permita a los usuarios crear perfiles, enviar mensajes, buscar a otros usuarios, crear publicaciones y ver las publicaciones de los demás usuarios.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+# Lenguajes utilizados
+- HTML
+- CSS
+- JavaScript
+- typescript
 
-## 🚀 Project Structure
+# Frameworks y librerías
+- Astro
+- TailwindCSS
+- Node.js
 
-Inside of your Astro project, you'll see the following folders and files:
+# Base de datos
+- MYSQL
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Login
+![alt text](image-1.png)
 
-## 🧞 Commands
+## Registro
+![alt text](image-3.png)
 
-All commands are run from the root of the project, from a terminal:
+## Contenido principal
+![alt text](image.png)
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Chat
+![alt text](image-2.png)
