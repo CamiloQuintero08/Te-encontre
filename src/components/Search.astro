@@ -18,7 +18,10 @@ const allUsers = await db
     .where(not(eq(users.id, currentUserId)));
 ---
 
-<div id="barra-busqueda-contenedor" class="hidden mb-6 sm:ml-64">
+<div
+    id="barra-busqueda-contenedor"
+    class="hidden sm:ml-65 bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%,rgba(120,119,198,0.3),rgba(255,255,255,0))] bg-opacity-70 shadow-sm shadow-black/5"
+>
     <div class="max-w-xl mx-auto">
         <div class="relative">
             <div
@@ -29,22 +32,16 @@ const allUsers = await db
             <input
                 type="search"
                 id="search-input-field"
-                class="block w-full p-3 ps-9 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm placeholder:text-gray-400"
+                class="block w-full p-3 ps-9 bg-white border border-gray-300 text-black text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm placeholder:text-gray-400"
                 placeholder="Buscar usuarios..."
                 autocomplete="off"
             />
         </div>
-
-        <!-- Search Results -->
         <div id="search-results" class="mt-4 hidden">
-            <div class="bg-white rounded-lg shadow-md max-h-96 overflow-y-auto">
+            <div class="bg-black rounded-lg shadow-md max-h-96 overflow-y-auto">
                 <div id="results-container" class="divide-y divide-gray-200">
-                    <!-- Results will be inserted here -->
                 </div>
-                <div
-                    id="no-results"
-                    class="hidden p-4 text-center text-gray-500"
-                >
+                <div id="no-results" class="hidden p-4 text-center text-white">
                     No se encontraron usuarios
                 </div>
             </div>
@@ -53,7 +50,6 @@ const allUsers = await db
 </div>
 
 <script define:vars={{ allUsers }}>
-    // Get elements
     const botonBuscar = document.getElementById("boton-activar-busqueda");
     const contenedorBusqueda = document.getElementById(
         "barra-busqueda-contenedor",
@@ -64,20 +60,16 @@ const allUsers = await db
     const noResults = document.getElementById("no-results");
 
     if (botonBuscar && contenedorBusqueda && campoBusqueda) {
-        // Toggle search bar
         botonBuscar.addEventListener("click", () => {
             contenedorBusqueda.classList.toggle("hidden");
 
             if (!contenedorBusqueda.classList.contains("hidden")) {
                 campoBusqueda.focus();
             } else {
-                // Clear search when closing
                 campoBusqueda.value = "";
                 searchResults.classList.add("hidden");
             }
         });
-
-        // Search functionality
         campoBusqueda.addEventListener("input", (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
 
@@ -85,28 +77,24 @@ const allUsers = await db
                 searchResults.classList.add("hidden");
                 return;
             }
-
-            // Filter users
             const filteredUsers = allUsers.filter(
                 (user) =>
                     user.name.toLowerCase().includes(searchTerm) ||
                     user.email.toLowerCase().includes(searchTerm),
             );
-
-            // Display results
             if (filteredUsers.length > 0) {
                 resultsContainer.innerHTML = filteredUsers
                     .map(
                         (user) => `
-                    <a href="/chat/${user.id}" class="flex items-center space-x-3 p-4 hover:bg-gray-50 transition">
+                    <a href="/chat/${user.id}" class="text-white flex items-center space-x-3 p-4 hover:bg-gray-800 hover:text-black transition">
                         <img
                             src="${user.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&size=48`}"
                             alt="${user.name}"
                             class="w-12 h-12 rounded-full object-cover"
                         />
                         <div class="flex-1 min-w-0">
-                            <p class="font-semibold text-gray-900 truncate">${user.name}</p>
-                            <p class="text-sm text-gray-500 truncate">${user.email}</p>
+                            <p class="font-semibold text-white truncate">${user.name}</p>
+                            <p class="text-sm text-white truncate">${user.email}</p>
                         </div>
                     </a>
                 `,
@@ -120,8 +108,6 @@ const allUsers = await db
 
             searchResults.classList.remove("hidden");
         });
-
-        // Close search results when clicking outside
         document.addEventListener("click", (e) => {
             if (
                 !contenedorBusqueda.contains(e.target) &&

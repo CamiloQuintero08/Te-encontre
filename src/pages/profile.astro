@@ -23,7 +23,6 @@ if ((currentUser[0] as any).length === 0) {
 // @ts-ignore
 const user = currentUser[0][0];
 
-// Get user's posts
 const userPosts = await db.execute(
     sql`SELECT * FROM post_details_view WHERE author_id = ${currentUserId} ORDER BY created_at DESC`,
 );
@@ -31,22 +30,26 @@ const posts = userPosts[0] as unknown as any[];
 ---
 
 <Layout>
-    <div class="ml-[260px] px-8 py-10 bg-linear-to-b from-blue-200 to-white min-h-screen">
+    <div
+        class="ml-[260px] px-8 py-10 bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] min-h-screen"
+    >
         <div class="max-w-2xl mx-auto">
-            <h1 class="text-3xl font-bold mb-6 text-orange-500">Mi Perfil</h1>
+            <h1 class="text-3xl font-bold mb-6 text-purple-500">Mi Perfil</h1>
 
-            <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="bg-black/70 rounded-lg shadow-md p-6">
                 <div class="flex items-center space-x-6 mb-6">
                     <img
                         src={user.photo ||
                             `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&size=128`}
                         alt={user.name}
-                        class="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                        class="w-32 h-32 rounded-full object-cover border-4 border-pink-500"
                     />
                     <div>
-                        <h2 class="text-2xl font-semibold">{user.name}</h2>
-                        <p class="text-gray-500">{user.email}</p>
-                        <p class="text-sm text-gray-400 mt-1">
+                        <h2 class="text-2xl font-semibold text-purple-500">
+                            {user.name}
+                        </h2>
+                        <p class="text-white">{user.email}</p>
+                        <p class="text-sm text-pink-400 mt-1">
                             Miembro desde {
                                 new Date(user.created_at!).toLocaleDateString(
                                     "es-ES",
@@ -62,23 +65,21 @@ const posts = userPosts[0] as unknown as any[];
                 </div>
                 <div class="flex space-x-8 ml-auto">
                     <div class="text-center">
-                        <span class="block text-xl font-bold text-gray-900"
+                        <span class="block text-xl font-bold text-pink-500"
                             >{user.post_count}</span
                         >
-                        <span class="text-sm text-gray-500">Posts</span>
+                        <span class="text-sm text-pink-400">Posts</span>
                     </div>
                     <div class="text-center">
-                        <span class="block text-xl font-bold text-gray-900"
+                        <span class="block text-xl font-bold text-pink-500"
                             >{user.friend_count}</span
                         >
-                        <span class="text-sm text-gray-500">Amigos</span>
+                        <span class="text-sm text-pink-400">Amigos</span>
                     </div>
                 </div>
             </div>
-
-            <!-- Update Photo Form -->
-            <div class="bg-white rounded-lg shadow-md p-6 mt-6">
-                <h3 class="text-lg font-semibold mb-4">
+            <div class="bg-black/70 rounded-lg shadow-md p-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4 text-white">
                     Actualizar Foto de Perfil
                 </h3>
                 <form
@@ -89,7 +90,7 @@ const posts = userPosts[0] as unknown as any[];
                 >
                     <div>
                         <label
-                            class="block text-sm font-medium text-gray-700 mb-2"
+                            class="block text-sm font-medium text-pink-300 mb-2"
                         >
                             Nueva foto de perfil
                         </label>
@@ -98,16 +99,16 @@ const posts = userPosts[0] as unknown as any[];
                             name="photo"
                             accept="image/jpeg,image/png,image/gif,image/webp"
                             required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            class="w-full px-4 py-2 border text-gray-500 border-pink-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         />
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p class="text-xs text-pink-300 mt-1">
                             Máximo 5MB. Formatos: JPG, PNG, GIF, WEBP
                         </p>
                     </div>
                     <div class="flex justify-end">
                         <button
                             type="submit"
-                            class="bg-yellow-500 text-black px-6 py-2 rounded-lg hover:bg-orange-500 transition font-medium"
+                            class="bg-purple-500 text-black px-6 py-2 rounded-lg hover:bg-purple-600 transition font-medium"
                         >
                             Actualizar Foto
                         </button>
@@ -116,7 +117,9 @@ const posts = userPosts[0] as unknown as any[];
             </div>
 
             <div class="mt-10">
-                <h2 class="text-2xl font-semibold mb-6">Mis Publicaciones</h2>
+                <h2 class="text-2xl font-semibold mb-6 text-purple-500">
+                    Mis Publicaciones
+                </h2>
                 <div class="space-y-6">
                     {
                         posts.map((post) => (

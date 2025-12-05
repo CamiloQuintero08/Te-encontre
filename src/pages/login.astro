@@ -4,78 +4,84 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout showAside={false}>
     <div
-        class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-linear-to-r from-blue-900 to-cyan-200"
+        class="flex min-h-full flex-col justify-center items-center px-6 py-12 lg:px-8 relative h-full w-full bg-slate-950 absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#3e3e3e,transparent)]"
     >
-        <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-            <h2
-                class="text-center text-5xl font-bold bg-linear-to-r from-yellow-500 to-orange-700 bg-clip-text text-transparent"
+        <div
+            class="flex flex-col items-center justify-center w-full max-w-md p-8 bg-black/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/30"
+        >
+            <div
+                class="w-full max-w-md p-8 bg-black/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/30"
             >
-                Bienvenid@s a I Found You
-            </h2>
-            <h2
-                class="mt-10 text-center text-xl font-semibold leading-4 tracking-tight text-black/80 text-shadow-lg text-shadow-white/50"
-            >
-                ¡Inicia sesión en tu cuenta ahora!
-            </h2>
-        </div>
+                <h2
+                    class="text-center text-5xl font-bold bg-linear-to-r from-purple-500 to-pink-700 bg-clip-text text-transparent"
+                >
+                    Bienvenid@s a I Found You
+                </h2>
+                <h2
+                    class="mt-10 text-center text-xl font-semibold leading-4 tracking-tight text-pink-300 text-shadow-lg text-shadow-purple-800"
+                >
+                    ¡Inicia sesión en tu cuenta ahora!
+                </h2>
+            </div>
 
-        <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form class="space-y-6" action="/api/auth/login" method="POST">
-                <div>
-                    <label
-                        for="email"
-                        class="block text-sm font-semibold leading-6 text-black"
-                        >Correo electrónico</label
-                    >
-                    <div class="mt-2">
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            autocomplete="email"
-                            required
-                            class="block w-full rounded-md border-0 py-1.5 bg-white text-black ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3 shadow-lg shadow-black/50"
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between">
+            <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                <form class="space-y-6" action="/api/auth/login" method="POST">
+                    <div>
                         <label
-                            for="password"
-                            class="block text-sm font-medium leading-6 text-black"
-                            >Contraseña</label
+                            for="email"
+                            class="block text-sm font-semibold leading-6 text-white"
+                            >Correo electrónico</label
+                        >
+                        <div class="mt-2">
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                autocomplete="email"
+                                required
+                                class="block w-full rounded-md border-0 py-1.5 bg-white text-black ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3 shadow-lg shadow-black/50"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <label
+                                for="password"
+                                class="block text-sm font-medium leading-6 text-white"
+                                >Contraseña</label
+                            >
+                        </div>
+                        <div class="mt-2">
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                autocomplete="current-password"
+                                required
+                                class="block w-full rounded-md border-0 py-1.5 bg-white text-black ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3 shadow-lg shadow-black/50"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <button
+                            type="submit"
+                            class="flex w-full justify-center rounded-md bg-pink-500 px-3 py-1.5 font-semibold leading-6 text-black shadow-sm hover:bg-pink-600 hover:shadow-lg hover:shadow-pink-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-600"
+                            >Iniciar sesión</button
                         >
                     </div>
-                    <div class="mt-2">
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            autocomplete="current-password"
-                            required
-                            class="block w-full rounded-md border-0 py-1.5 bg-white text-black ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 px-3 shadow-lg shadow-black/50"
-                        />
-                    </div>
-                </div>
-
+                </form>
                 <div>
-                    <button
-                        type="submit"
-                        class="flex w-full justify-center rounded-md bg-yellow-400 px-3 py-1.5 font-semibold leading-6 text-black hover:text-white shadow-sm hover:bg-orange-500 hover:shadow-lg hover:shadow-orange-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
-                        >Iniciar sesión</button
-                    >
+                    <p class="mt-10 text-center text-sm text-pink-300">
+                        ¿No tienes cuenta?
+                        <a
+                            href="/register"
+                            class="font-semibold leading-6 text-white hover:text-pink-600 hover:underline hover:decoration-pink-600"
+                            >Regístrate aquí</a
+                        >
+                    </p>
                 </div>
-            </form>
-            <div>
-                <p class="mt-10 text-center text-sm text-white">
-                    ¿No tienes cuenta?
-                    <a
-                        href="/register"
-                        class="font-semibold leading-6 text-black hover:text-red-600 hover:underline hover:decoration-red-600"
-                        >Regístrate aquí</a
-                    >
-                </p>
             </div>
         </div>
     </div>

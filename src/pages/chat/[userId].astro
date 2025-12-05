@@ -25,8 +25,6 @@ const otherUser = await db
 if (otherUser.length === 0) {
     return Astro.redirect("/");
 }
-
-// Get messages between current user and other user
 const conversation = await db
     .select()
     .from(messages)
@@ -46,11 +44,12 @@ const conversation = await db
 ---
 
 <Layout>
-    <div class="ml-[260px] px-8 py-10 bg-linear-to-b from-blue-200 to-white min-h-screen">
+    <div
+        class="ml-[260px] px-8 py-10 bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] min-h-screen"
+    >
         <div class="max-w-4xl mx-auto">
-            <!-- Chat Header -->
             <div
-                class="bg-white rounded-lg shadow-md p-4 mb-4 flex items-center space-x-4"
+                class="bg-black/20 text-white rounded-lg shadow-md p-4 mb-4 flex items-center space-x-4"
             >
                 <img
                     src={otherUser[0].photo ||
@@ -63,10 +62,8 @@ const conversation = await db
                     <p class="text-sm text-gray-500">Chat</p>
                 </div>
             </div>
-
-            <!-- Messages -->
             <div
-                class="bg-white rounded-lg shadow-md p-6 mb-4 min-h-[500px] max-h-[500px] overflow-y-auto"
+                class="bg-black/20 rounded-lg shadow-md p-6 mb-4 min-h-[500px] max-h-[500px] overflow-y-auto"
             >
                 <div class="space-y-4">
                     {
@@ -77,8 +74,8 @@ const conversation = await db
                                 <div
                                     class={`max-w-xs px-4 py-2 rounded-lg relative ${
                                         msg.senderId === currentUserId
-                                            ? "bg-yellow-500 text-black"
-                                            : "bg-gray-200 text-gray-900"
+                                            ? "bg-purple-500 text-black"
+                                            : "bg-pink-300 text-gray-900"
                                     }`}
                                 >
                                     <p class="whitespace-pre-wrap">
@@ -128,7 +125,7 @@ const conversation = await db
                                     {/* Edit Message Inline */}
                                     <div
                                         id={`edit-msg-${msg.id}`}
-                                        class="hidden absolute inset-0 bg-white rounded-lg p-2 z-10"
+                                        class="hidden items-center justify-center inset-0 bg-white rounded-lg p-2 z-10"
                                     >
                                         <form
                                             action="/api/messages/edit"
@@ -142,7 +139,7 @@ const conversation = await db
                                             />
                                             <textarea
                                                 name="content"
-                                                class="flex-1 text-sm border border-gray-300 rounded p-1 mb-2 focus:ring-1 focus:ring-orange-500"
+                                                class="flex-1 text-sm border border-gray-300 rounded p-1 mb-2 focus:ring-1 focus:ring-purple-500"
                                                 required
                                             >
                                                 {msg.content}
@@ -150,7 +147,7 @@ const conversation = await db
                                             <div class="flex justify-end space-x-2">
                                                 <button
                                                     type="submit"
-                                                    class="text-xs bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700"
+                                                    class="text-xs bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600"
                                                 >
                                                     Guardar
                                                 </button>
@@ -170,9 +167,7 @@ const conversation = await db
                     }
                 </div>
             </div>
-
-            <!-- Message Input -->
-            <div class="bg-white rounded-lg shadow-md p-4">
+            <div class="bg-black/20 text-white rounded-lg shadow-md p-4">
                 <form
                     action="/api/messages/send"
                     method="POST"
@@ -188,11 +183,11 @@ const conversation = await db
                         name="content"
                         placeholder="Escribe un mensaje..."
                         required
-                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                     <button
                         type="submit"
-                        class="bg-yellow-500 text-black px-6 py-2 rounded-lg hover:bg-orange-500 transition font-medium"
+                        class="bg-purple-500 text-black px-6 py-2 rounded-lg hover:bg-purple-600 transition font-medium"
                     >
                         Enviar
                     </button>

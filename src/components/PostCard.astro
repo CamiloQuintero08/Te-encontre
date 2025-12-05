@@ -31,7 +31,7 @@ const currentUserId = Astro.cookies.get("user_id")?.number();
 const isAuthor = currentUserId === post.author.id;
 ---
 
-<div class="bg-white rounded-lg shadow-md p-6 mb-4">
+<div class="bg-black/70 rounded-lg shadow-md p-6 mb-4">
     <div class="flex items-start space-x-4">
         <img
             src={post.author.photo ||
@@ -41,78 +41,101 @@ const isAuthor = currentUserId === post.author.id;
         />
         <div class="flex-1">
             <div class="flex items-center justify-between">
-                <h3 class="font-semibold text-gray-900">{post.author.name}</h3>
+                <h3 class="font-semibold text-white">{post.author.name}</h3>
                 <div class="flex items-center space-x-2">
                     <span class="text-sm text-gray-500">
                         {
-                            new Date(post.createdAt).toLocaleDateString("es-ES", {
-                                day: "numeric",
-                                month: "short",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                            })
+                            new Date(post.createdAt).toLocaleDateString(
+                                "es-ES",
+                                {
+                                    day: "numeric",
+                                    month: "short",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                },
+                            )
                         }
                     </span>
-                    {isAuthor && (
-                        <div class="relative">
-                            <button 
-                                type="button" 
-                                class="text-gray-400 hover:text-gray-600 peer"
-                                onclick="this.nextElementSibling.classList.toggle('hidden')"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                                </svg>
-                            </button>
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden hover:block peer-focus:block z-20 border border-gray-100">
-                                <div class="py-1">
-                                    <button 
-                                        type="button"
-                                        onclick={`document.getElementById('edit-post-${post.id}').classList.remove('hidden')`}
-                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    {
+                        isAuthor && (
+                            <div class="relative">
+                                <button
+                                    type="button"
+                                    class="text-gray-400 hover:text-gray-600 peer"
+                                    onclick="this.nextElementSibling.classList.toggle('hidden')"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-5 w-5"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
                                     >
-                                        Editar
-                                    </button>
-                                    <form action="/api/posts/delete" method="POST" class="w-full">
-                                        <input type="hidden" name="postId" value={post.id} />
-                                        <button 
-                                            type="submit" 
-                                            onclick="return confirm('¿Estás seguro de eliminar esta publicación?');"
-                                            class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                    </svg>
+                                </button>
+                                <div class="absolute right-0 mt-2 w-48 bg-black rounded-md shadow-lg hidden hover:block peer-focus:block z-20 border border-gray-100">
+                                    <div class="py-1">
+                                        <button
+                                            type="button"
+                                            onclick={`document.getElementById('edit-post-${post.id}').classList.remove('hidden')`}
+                                            class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-500"
                                         >
-                                            Eliminar
+                                            Editar
                                         </button>
-                                    </form>
+                                        <form
+                                            action="/api/posts/delete"
+                                            method="POST"
+                                            class="w-full"
+                                        >
+                                            <input
+                                                type="hidden"
+                                                name="postId"
+                                                value={post.id}
+                                            />
+                                            <button
+                                                type="submit"
+                                                onclick="return confirm('¿Estás seguro de eliminar esta publicación?');"
+                                                class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-500"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )
+                    }
                 </div>
             </div>
-            
+
             {/* Edit Modal */}
-            <div id={`edit-post-${post.id}`} class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+            <div
+                id={`edit-post-${post.id}`}
+                class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+            >
                 <div class="bg-white rounded-lg p-6 w-full max-w-lg mx-4">
-                    <h3 class="text-lg font-semibold mb-4">Editar Publicación</h3>
+                    <h3 class="text-lg font-semibold mb-4">
+                        Editar Publicación
+                    </h3>
                     <form action="/api/posts/edit" method="POST">
                         <input type="hidden" name="postId" value={post.id} />
                         <textarea
                             name="content"
                             rows="4"
                             class="w-full border border-gray-300 rounded-lg p-2 mb-4 focus:ring-2 focus:ring-indigo-500"
-                            required
-                        >{post.content}</textarea>
+                            required>{post.content}</textarea
+                        >
                         <div class="flex justify-end space-x-2">
-                            <button 
+                            <button
                                 type="button"
                                 onclick={`document.getElementById('edit-post-${post.id}').classList.add('hidden')`}
-                                class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                                class="px-4 py-2 bg-black text-white hover:bg-gray-700 rounded-lg"
                             >
                                 Cancelar
                             </button>
-                            <button 
+                            <button
                                 type="submit"
-                                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-yellow-400"
+                                class="px-4 py-2 bg-purple-500 text-black rounded-lg hover:bg-purple-600"
                             >
                                 Guardar
                             </button>
@@ -120,7 +143,7 @@ const isAuthor = currentUserId === post.author.id;
                     </form>
                 </div>
             </div>
-            <p class="mt-2 text-gray-700 whitespace-pre-wrap">{post.content}</p>
+            <p class="mt-2 text-white whitespace-pre-wrap">{post.content}</p>
             {
                 post.imageUrl && (
                     <div class="mt-4 relative group">
@@ -136,14 +159,22 @@ const isAuthor = currentUserId === post.author.id;
                                 onclick={`document.getElementById('modal-${post.id}').classList.remove('hidden')`}
                                 class="bg-black/70 text-white px-3 py-1 rounded-lg text-sm flex items-center space-x-1"
                             >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                                    />
                                 </svg>
                                 <span>Ver completa</span>
                             </button>
                         </div>
-                        
-                        <!-- Modal for full image -->
                         <div
                             id={`modal-${post.id}`}
                             class="hidden fixed inset-0 bg-black/90 z-50 p-4"
@@ -155,8 +186,18 @@ const isAuthor = currentUserId === post.author.id;
                                     class="absolute top-4 right-4 text-white hover:text-gray-300 transition"
                                     onclick={`document.getElementById('modal-${post.id}').classList.add('hidden')`}
                                 >
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    <svg
+                                        class="w-8 h-8"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
                                     </svg>
                                 </button>
                                 <img
@@ -198,14 +239,10 @@ const isAuthor = currentUserId === post.author.id;
                     </button>
                 </form>
             </div>
-
-            <!-- Comments Section -->
             <div class="mt-6 border-t pt-4">
-                <h4 class="font-semibold text-gray-900 mb-3">
+                <h4 class="font-semibold text-white mb-3">
                     Comentarios ({post.commentsCount})
                 </h4>
-
-                <!-- Comments List -->
                 <div class="space-y-3 mb-4">
                     {
                         post.comments.map((comment) => (
@@ -223,17 +260,30 @@ const isAuthor = currentUserId === post.author.id;
                                         <p class="font-semibold text-sm">
                                             {comment.author.name}
                                         </p>
-                                        {currentUserId === comment.author.id && (
+                                        {currentUserId ===
+                                            comment.author.id && (
                                             <div class="flex space-x-2 opacity-0 group-hover/comment:opacity-100 transition">
-                                                <button 
+                                                <button
                                                     onclick={`document.getElementById('edit-comment-${comment.id}').classList.remove('hidden')`}
                                                     class="text-xs text-gray-500 hover:text-gray-700"
                                                 >
                                                     Editar
                                                 </button>
-                                                <form action="/api/comments/delete" method="POST" onsubmit="return confirm('¿Eliminar comentario?');" class="inline">
-                                                    <input type="hidden" name="commentId" value={comment.id} />
-                                                    <button type="submit" class="text-xs text-red-500 hover:text-red-700">
+                                                <form
+                                                    action="/api/comments/delete"
+                                                    method="POST"
+                                                    onsubmit="return confirm('¿Eliminar comentario?');"
+                                                    class="inline"
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="commentId"
+                                                        value={comment.id}
+                                                    />
+                                                    <button
+                                                        type="submit"
+                                                        class="text-xs text-red-500 hover:text-red-700"
+                                                    >
                                                         Eliminar
                                                     </button>
                                                 </form>
@@ -253,21 +303,35 @@ const isAuthor = currentUserId === post.author.id;
                                             minute: "2-digit",
                                         })}
                                     </p>
-                                    
-                                    {/* Edit Comment Modal/Form Inline */}
-                                    <div id={`edit-comment-${comment.id}`} class="hidden absolute inset-0 bg-white z-10 p-1 rounded-lg">
-                                        <form action="/api/comments/edit" method="POST" class="flex h-full">
-                                            <input type="hidden" name="commentId" value={comment.id} />
-                                            <input 
-                                                type="text" 
-                                                name="content" 
+                                    <div
+                                        id={`edit-comment-${comment.id}`}
+                                        class="hidden absolute inset-0 bg-white z-10 p-1 rounded-lg"
+                                    >
+                                        <form
+                                            action="/api/comments/edit"
+                                            method="POST"
+                                            class="flex h-full"
+                                        >
+                                            <input
+                                                type="hidden"
+                                                name="commentId"
+                                                value={comment.id}
+                                            />
+                                            <input
+                                                type="text"
+                                                name="content"
                                                 value={comment.content}
                                                 class="flex-1 text-sm border-none focus:ring-0 bg-transparent"
                                                 required
                                             />
-                                            <button type="submit" class="text-xs text-indigo-600 font-medium px-2">Guardar</button>
-                                            <button 
-                                                type="button" 
+                                            <button
+                                                type="submit"
+                                                class="text-xs text-indigo-600 font-medium px-2"
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button
+                                                type="button"
                                                 onclick={`document.getElementById('edit-comment-${comment.id}').classList.add('hidden')`}
                                                 class="text-xs text-gray-500 px-2"
                                             >
@@ -291,11 +355,11 @@ const isAuthor = currentUserId === post.author.id;
                         name="content"
                         placeholder="Escribe un comentario..."
                         required
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                        class="flex-1 px-3 py-2 border text-gray-50 border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                     />
                     <button
                         type="submit"
-                        class="bg-yellow-500 text-black px-4 py-2 rounded-lg hover:bg-orange-500 transition text-sm font-medium"
+                        class="bg-pink-500 text-black px-4 py-2 rounded-lg hover:bg-pink-600 transition text-sm font-medium"
                     >
                         Comentar
                     </button>
